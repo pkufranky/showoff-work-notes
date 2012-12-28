@@ -1,0 +1,262 @@
+{toc:maxLevel=3}
+
+h1. resources
+
+h2. person
+
+{code}
+{
+    id: {string},
+    url: {url}, // home url
+    nickname: {string},
+}
+{code}
+
+h2. trip
+
+{code}
+{
+    id: {string},
+    title: {string},
+    cover: {url},
+    author: {person short},
+    notes: [{note}],
+    tips: [{string}],
+}
+{code}
+
+h2. note
+
+{code}
+{
+    id: {string},
+    type: {photo|text},
+    trip_id: {string},
+    pos: {int}, // start from 0. position in trip.
+    description: {string},
+
+    // for type=photo
+    photo: {
+        src: {url},
+        width: {int},
+        height: {int},
+    }
+    time: {datetime}, // '2012-07-03 07:46:33',
+}
+{code}
+
+h2. place
+
+{code}
+{
+    id: {string},
+    name: {string}, // 北京辉煌时代家具有限公司
+	lon: {number}, // 经度, 如 122.32312
+	lat: {number}, // 纬度, 如 39.93231
+}
+{code}
+
+h1. api
+
+h2. trip api
+
+h3. (auth) trip.post
+
+h4. Request
+
+{code}
+POST http://chanyouji.com/trips
+Content-Type: application/x-www-form-urlencoded; charset=UTF-8
+{code}
+
+h4. Parameters (POST)
+
+|| 参数 || 值 || 意义 ||
+|name|string|游记名|
+
+h4. Response
+
+成功返回
+{code}
+201 Created
+
+{
+	id: {int},
+	name: {string},
+}
+{code}
+
+h3. (auth) trip.put
+
+h4. Request
+
+{code}
+POST http://chanyouji.com/trips/:tripId
+Content-Type: application/x-www-form-urlencoded; charset=UTF-8
+{code}
+
+h4. Parameters (POST)
+
+通用参数 \_method=PUT
+
+更新name
+
+|| 参数 || 值 || 意义 ||
+|name|string|要更新的游记名|
+
+h4. Response
+
+成功返回
+{code}
+200 OK
+
+{
+	id: {int},
+	name: {string},
+}
+{code}
+
+
+h2. note api
+
+h3. note.post
+
+创建text note
+
+h4. Request
+
+{code}
+POST http://chanyouji.com/trips/:tripId/notes
+{code}
+
+h4. Parameters (POST)
+
+|| 参数 || 值 || 意义 || 备注 ||
+| pos | int | 位置. -1表示末尾 | start from 0 |
+| description | string | 文本内容 |
+
+h4. Response
+
+成功返回 note resource
+
+{code}
+201 Created
+
+{note}
+
+{
+	id: {int},
+	description: {string}
+}
+{code}
+
+h3. note.upload
+
+h4. Request
+
+{code}
+POST http://chanyouji.com/trips/:tripId/notes/upload
+Content-Type: multipart/form-data
+
+<parameters>
+<FILE CONTENT>
+{code}
+
+h4. Parameters (POST)
+
+|| 参数 || 值 || 意义 || 备注 ||
+| type | photo | | |
+| mimetype | \{mimetype\} | | |
+| resourceId | string |
+| pos | int | 位置. -1表示末尾 | start from 0 |
+| description | string | 文本内容 |
+
+h4. Response
+
+成功返回 note resource
+
+{code}
+200 OK
+
+{note}
+{code}
+
+
+h3. note.put
+
+h4. Request
+
+{code}
+PUT http://chanyouji.com/trips/:tripId/notes/:noteId
+Content-Type: application/x-www-form-urlencoded; charset=UTF-8
+{code}
+
+h4. Parameters (POST)
+
+参数指定要更新的域和值
+
+|| 参数 || 值 || 意义 ||
+| description | string | |
+
+h4. Response
+
+成功返回
+{code}
+200 OK
+
+{
+    id: {string},
+    description:{string}
+}
+{code}
+
+h3. note.delete
+
+h4. Request
+
+{code}
+DELETE http://chanyouji.com/trips/:tripId/notes/:noteId
+{code}
+
+h4. Response
+
+成功返回
+{code}
+200 OK
+{code}
+
+
+h2. place api
+
+h3. place.list
+
+h4. Request
+
+{code}
+GET http://chanyouji.com/places
+{code}
+
+h4. Parameters (GET)
+
+|| 参数 || 值 || 意义 || 备注 ||
+| *location | string | lon,lat | 经纬度 |搜索给定经纬度周边，为空则在整不限范围进行搜索 |
+| *q | string | 查询关键字 | 为空则列出location附近所有places |
+
+location和q至少得提供一个
+
+h4. Response
+
+成功返回
+
+{code}
+200 OK
+
+{
+	totalResults: {int}, // 结果总数
+	start: {int}, // 返回的初始元素索引
+	items: [
+		{place resource}
+	]
+}
+{code}
+
